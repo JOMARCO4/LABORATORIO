@@ -53,12 +53,12 @@ where a.last_name = 'ALLEN' ;
 
 -- 7 Encuentra la cantidad total de películas en cada clasificación de la tabla “filmˮ y muestra la clasificación junto con el recuento.
 
-select c."name", count(c."name")
-from film f
-join film_category fc on f.film_id = fc.film_id
-join category c on fc.category_id = c.category_id
-group by c."name"
-order by count(c."name") desc;
+SELECT 
+    f.rating, 
+    COUNT(*) AS total_movies
+FROM film AS f
+GROUP BY f.rating
+ORDER BY total_movies DESC;
 
 
 
@@ -111,12 +111,12 @@ where  f.rating not in ('NC-17','G');
 
 -- 13 Encuentra el promedio de duración de las películas para cada clasificación de la tabla film y muestra la clasificación junto con el promedio de duración
 
-select c.name, avg(f.length)
-from film f
-join film_category fc on f.film_id = fc.film_id
-join category c on fc.category_id = c.category_id
-group by  c."name" 
-order by avg(f.length) desc;
+SELECT 
+    f.rating AS classification,
+    AVG(f.length) AS avg_duration
+FROM film f
+GROUP BY f.rating
+ORDER BY avg_duration DESC;
 
 
 
@@ -181,12 +181,15 @@ where f.length > 180 and c."name" = 'Comedy';
 
 -- 20 Encuentra las categorías de películas que tienen un promedio de duración superior a 110 minutos y muestra el nombre de la categoría junto con el promedio de duración.
 
-select c."name", AVG(f.length)
-from film f
-join film_category fc on f.film_id = fc.film_id
-join category c on fc.category_id = c.category_id
-where f.length > 110
-group by c."name";
+SELECT 
+    c.name AS category_name,
+    AVG(f.length) AS avg_duration
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+GROUP BY c.name
+HAVING AVG(f.length) > 110
+ORDER BY avg_duration DESC;
 
 
 
@@ -411,20 +414,30 @@ limit 1;
 
 -- 42  Encuentra todos los alquileres y los nombres de los clientes que los realizaron.
 
-select c.customer_id , concat(c.first_name,' ', c.last_name) as nombre_completo, r.rental_id, r.rental_date, r.return_date  
-from rental r
-join customer c on r.customer_id = r.customer_id
-order by r.rental_id;
+SELECT
+    c.customer_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS full_name,
+    r.rental_id,
+    r.rental_date,
+    r.return_date
+FROM rental r
+JOIN customer c ON r.customer_id = c.customer_id
+ORDER BY r.rental_id;
 
 
 
 
 -- 43  Muestra todos los clientes y sus alquileres si existen, incluyendo aquellos que no tienen alquileres.
 
-select c.customer_id , concat(c.first_name,' ', c.last_name) as nombre_completo, r.rental_id, r.rental_date, r.return_date
-from customer c
-join rental r on c.customer_id = r.customer_id
-order by c.customer_id, r.rental_id;
+SELECT
+    c.customer_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS full_name,
+    r.rental_id,
+    r.rental_date,
+    r.return_date
+FROM customer c
+LEFT JOIN rental r ON c.customer_id = r.customer_id
+ORDER BY c.customer_id, r.rental_id;
 
 
 
@@ -458,12 +471,12 @@ order by nombre_completo;
 
 -- 46  Encuentra todos los actores que no han participado en películas.
 
-select concat(A.first_name,' ', A.last_name) as nombre_completo_actor, COUNT(f.title) 
-from film f 
-join film_actor fa on f.film_id = fa.film_id
-join actor a on a.actor_id = fa.actor_id
-group by nombre_completo_actor
-having count(f.title) = 0; 
+SELECT
+    CONCAT(a.first_name, ' ', a.last_name) AS full_name
+FROM actor a
+LEFT JOIN film_actor fa ON a.actor_id = fa.actor_id
+WHERE fa.film_id IS NULL
+ORDER BY full_name;
 
 
 
@@ -557,15 +570,19 @@ order by F.title;
 
 -- 54 Encuentra los nombres de los actores que han actuado en al menos una película que pertenece a la categoría ‘Sci-Fiʼ. Ordena los resultados alfabéticamente por apellido.
 
-select a.first_name, a.last_name, count(distinct f.film_id), string_agg(f.title,', ')
-from actor a
-join film_actor fa on a.actor_id = fa.actor_id
-join film f on f.film_id  = fa.film_id
-join film_category fc on f.film_id = fc.film_id
-join category c on c.category_id = fc.category_id
-where upper(c."name") = upper ('Sci-Fi')
-group by a.first_name, a.last_name
-having count(distinct f.film_id) > 0 ;
+SELECT
+    a.first_name,
+    a.last_name,
+    COUNT(DISTINCT f.film_id) AS film_count,
+    STRING_AGG(f.title, ', ' ORDER BY f.title) AS film_titles
+FROM actor a
+JOIN film_actor fa ON a.actor_id = fa.actor_id
+JOIN film f ON f.film_id = fa.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON c.category_id = fc.category_id
+WHERE UPPER(c.name) = 'SCI-FI'
+GROUP BY a.first_name, a.last_name
+ORDER BY a.last_name, a.first_name;
 
 
 
@@ -658,12 +675,16 @@ order by C.last_name, c.first_name;
 
 -- 61  Encuentra la cantidad total de películas alquiladas por categoría y muestra el nombre de la categoría junto con el recuento de alquileres.
 
-select COUNT(f.film_id) as CANTIDAD_PELICULAS_ALQUILADAS, C."name" as categoria 
-from film f 
-join film_category fc on f.film_id = fc.film_id
-join category c on c.category_id = fc.category_id
-WHERE f.rental_duration is not NULL
-group by c.name;
+SELECT
+    c.name AS category_name,
+    COUNT(r.rental_id) AS total_rentals
+FROM category c
+JOIN film_category fc ON c.category_id = fc.category_id
+JOIN film f ON fc.film_id = f.film_id
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY c.name
+ORDER BY total_rentals DESC;
 
 
 
