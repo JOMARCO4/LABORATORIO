@@ -1,7 +1,7 @@
 -- DATA PROJECT: LÓGICA CONSULTAS SQL
 
 -- 1 Crea el esquema de la BBDD.
--- esquema ha sido creado y reorganizado. Para acceder entraremos en la BBDD Chinook / Esquemas / public. Click derecho y Ver esquema.Además ha sido puesto en Bookmarks, denominado como ESQUEMA BBDD.
+-- esquema ha sido creado y reorganizado. Para acceder entraremos en la BBDD Chinook / Esquemas / public. Click derecho y Ver esquema. Además ha sido puesto en Bookmarks, denominado como ESQUEMA BBDD.
 
 
 
