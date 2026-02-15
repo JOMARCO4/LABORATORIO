@@ -1,2 +1,0 @@
-## Data Analytics
-### The Power
