@@ -25,7 +25,8 @@ KPIS_INDITEX_ONETEAM.pbix
 ```
 
 Este archivo se conecta a varias carpetas y archivos Excel que contienen los datos operativos de cada subequipo.
-
+No obstante, el archivo informe_INDITEXPBI.pdf es el que explica, de forma resumida, todo el trabajo (procesos y transformaciones) llevado a cabo.
+ 
 ---
 
 # 📂 Archivos incluidos
@@ -36,6 +37,7 @@ El proyecto se basa en una **estructura de carpetas organizada por equipos y fun
 Project Folder
 │
 ├── KPIS_INDITEX_ONETEAM.pbix
+├── informe_INDITEXPBI.pdf
 │
 ├── Control Tower - NETHERLANDS (CT NL)
 │   ├── KPIs_2025_CTNL_OCEAN.xlsx
